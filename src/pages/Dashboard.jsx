@@ -220,10 +220,10 @@ export default function Dashboard() {
         <div className="dashboard-banner__text">
           <h1>
             {isDoctor
-              ? `Welcome back, ${user?.name || 'Practitioner'} 🩺`
+              ? `Welcome back, ${user?.name || 'Practitioner'} `
               : isAdmin
-              ? `Clinic Administration Portal 🏥`
-              : `Welcome back, ${user?.name || 'Patient'} 👋`}
+              ? `Clinic Administration Portal`
+              : `Welcome back, ${user?.name || 'Patient'}`}
           </h1>
           <p>
             {isDoctor

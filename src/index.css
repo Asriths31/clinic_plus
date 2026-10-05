@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 :root {
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-primary-light: rgba(79, 70, 229, 0.1);
-  --color-secondary: #6366f1;
+  --color-primary: #08A058;
+  --color-primary-hover: #068046;
+  --color-primary-light: #e0f2e9;
+  --color-secondary: #0A245c;
   --color-success: #10b981;
   --color-success-bg: rgba(16, 185, 129, 0.12);
   --color-warning: #f59e0b;
@@ -18,10 +18,10 @@
   --accent-appt: #0284c7;
   --accent-appt-bg: rgba(2, 132, 199, 0.12);
 
-  --bg-app: #f4f7f9;
+  --bg-app: #fcfcfd;
   --bg-surface: #ffffff;
-  --bg-sidebar: #0f172a;
-  --bg-sidebar-hover: #1e293b;
+  --bg-sidebar: #ffffff;
+  --bg-sidebar-hover: #f2f4f7;
   --bg-input: #ffffff;
   --bg-muted: #f1f5f9;
 
@@ -30,21 +30,21 @@
   --text-subtle: #94a3b8;
   --text-inverse: #f8fafc;
 
-  --border-color: #e2e8f0;
-  --border-focus: #38bdf8;
+  --border-color: #eaecf0;
+  --border-focus: #1a64f0;
 
-  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.05), 0 4px 12px -4px rgba(15, 23, 42, 0.02);
-  --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.06), 0 6px 12px -6px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 16px 32px -4px rgba(15, 23, 42, 0.08), 0 8px 16px -8px rgba(15, 23, 42, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+  --shadow-sm: none;
+  --shadow-md: 0 1px 3px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+  --shadow-xl: 0 10px 15px -3px rgba(16, 24, 40, 0.05);
 
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -79,7 +79,7 @@ button, input, select, textarea {
 
 /* Typography Utilities */
 .text-gradient {
-  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #6366f1 100%);
+  background: linear-gradient(90deg, #08A058 0%, #0bcd71 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -118,15 +118,13 @@ button, input, select, textarea {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #6366f1 100%);
+  background: var(--color-primary);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   border: none;
 }
 .btn--primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
-  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+  background: var(--color-primary-hover);
 }
 
 .btn--outline {

@@ -23,7 +23,6 @@ export default function Landing() {
       {/* Hero */}
       <section className="landing__hero">
         <div className="landing__hero-content">
-          <div className="landing__hero-badge">🏥 Modern Healthcare Management</div>
           <h1 className="landing__hero-title">
             Streamline Your <span className="text-gradient">Clinic Operations</span>
           </h1>
@@ -65,26 +64,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="landing__stats">
-        <div className="landing__stat">
-          <span className="landing__stat-number">99.9%</span>
-          <span className="landing__stat-label">Uptime</span>
-        </div>
-        <div className="landing__stat">
-          <span className="landing__stat-number">0</span>
-          <span className="landing__stat-label">Scheduling Conflicts</span>
-        </div>
-        <div className="landing__stat">
-          <span className="landing__stat-number">24/7</span>
-          <span className="landing__stat-label">Access</span>
-        </div>
-        <div className="landing__stat">
-          <span className="landing__stat-number">HIPAA</span>
-          <span className="landing__stat-label">Compliant Ready</span>
-        </div>
-      </section>
-
+     
       {/* Services */}
       <section id="services" className="landing__services">
         <div className="landing__section-header">
