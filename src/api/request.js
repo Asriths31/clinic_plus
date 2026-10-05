@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL="https://clinic-plus-server.vercel.app/api"
+const baseURL="https://clinic-plus-server.onrender.com/api"
 // const baseURL="http://localhost:2000/api"
 const api = axios.create({
   baseURL,
