@@ -92,6 +92,7 @@ export default function Doctors() {
     if (!form.email.trim()) errs.email = 'Email address is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email address';
     if (!form.specialization.trim()) errs.specialization = 'Specialization is required';
+    if (form.phone && form.phone.length !== 10) errs.phone = 'Phone number must be exactly 10 digits';
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -316,13 +317,19 @@ export default function Doctors() {
 
           <div className="form-group">
             <label htmlFor="d-phone">Phone Number</label>
-            <input
-              id="d-phone"
-              type="tel"
-              placeholder="+1 555-0144"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#666', zIndex: 1, fontSize: '0.9rem', fontWeight: 500 }}>+91</span>
+              <input
+                id="d-phone"
+                type="tel"
+                placeholder="XXXXXXXXXX"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                className={formErrors.phone ? 'input-error' : ''}
+                style={{ paddingLeft: '2.5rem', width: '100%' }}
+              />
+            </div>
+            {formErrors.phone && <span className="field-error">{formErrors.phone}</span>}
           </div>
 
           {modalMode === 'create' && (

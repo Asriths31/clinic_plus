@@ -62,9 +62,9 @@ export default function Signup() {
         else if (value !== allValues.password) err = 'Passwords do not match';
         break;
       case 'phone':
-        if (!value.trim()) err = 'Phone number is required';
-        else if (!/^\+?[0-9\s-]{10,15}$/.test(value.trim().replace(/[\s()-]/g, ''))) {
-          err = 'Enter a valid phone number (at least 10 digits)';
+        if (!value) err = 'Phone number is required';
+        else if (value.length !== 10) {
+          err = 'Phone number must be exactly 10 digits';
         }
         break;
       case 'dob':
@@ -189,13 +189,15 @@ export default function Signup() {
               <label htmlFor="reg-phone">Phone Number *</label>
               <div className="input-icon-wrap">
                 <FiPhone className="input-icon" />
+                <span style={{ position: 'absolute', left: '2.5rem', top: '50%', transform: 'translateY(-50%)', color: '#666', zIndex: 1, fontSize: '0.9rem', fontWeight: 500 }}>+91</span>
                 <input
                   id="reg-phone"
                   type="tel"
-                  placeholder="+1 (555) 234-5678"
+                  placeholder="XXXXXXXXXX"
                   value={form.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
+                  onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className={errors.phone ? 'input-error' : ''}
+                  style={{ paddingLeft: '4.5rem' }}
                 />
               </div>
               {errors.phone && <span className="field-error">{errors.phone}</span>}

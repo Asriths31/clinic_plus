@@ -85,6 +85,8 @@ export default function Patients() {
     if (!form.userName.trim()) errs.userName = 'Full name is required';
     if (!form.email.trim()) errs.email = 'Email address is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email address';
+    if (modalMode === 'create' && !form.password.trim()) errs.password = 'Password is required';
+    if (form.phone && form.phone.length !== 10) errs.phone = 'Phone number must be exactly 10 digits';
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -299,13 +301,19 @@ export default function Patients() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="p-phone">Phone Number</label>
-              <input
-                id="p-phone"
-                type="tel"
-                placeholder="+1 555-0199"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#666', zIndex: 1, fontSize: '0.9rem', fontWeight: 500 }}>+91</span>
+                <input
+                  id="p-phone"
+                  type="tel"
+                  placeholder="XXXXXXXXXX"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                  className={formErrors.phone ? 'input-error' : ''}
+                  style={{ paddingLeft: '2.5rem', width: '100%' }}
+                />
+              </div>
+              {formErrors.phone && <span className="field-error">{formErrors.phone}</span>}
             </div>
 
             <div className="form-group">
@@ -379,14 +387,17 @@ export default function Patients() {
 
           {modalMode === 'create' && (
             <div className="form-group">
-              <label htmlFor="p-password">Account Password (Optional)</label>
+              <label htmlFor="p-password">Account Password</label>
               <input
                 id="p-password"
                 type="password"
-                placeholder="Optional login password for portal"
+                placeholder="login password for portal"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className={formErrors.password ? 'input-error' : ''}
               />
+              {formErrors.password && <span className="field-error">{formErrors.password}</span>}
+
             </div>
           )}
 

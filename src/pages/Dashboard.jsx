@@ -195,6 +195,7 @@ export default function Dashboard() {
     if (!doctorForm.email.trim()) errs.email = 'Email address is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(doctorForm.email)) errs.email = 'Invalid email address';
     if (!doctorForm.specialization.trim()) errs.specialization = 'Specialization is required';
+    if (doctorForm.phone && doctorForm.phone.length !== 10) errs.phone = 'Phone number must be exactly 10 digits';
     setDoctorFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -990,13 +991,19 @@ export default function Dashboard() {
 
           <div className="form-group">
             <label htmlFor="ad-phone">Phone Number</label>
-            <input
-              id="ad-phone"
-              type="tel"
-              placeholder="+1 555-0144"
-              value={doctorForm.phone}
-              onChange={(e) => setDoctorForm({ ...doctorForm, phone: e.target.value })}
-            />
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#666', zIndex: 1, fontSize: '0.9rem', fontWeight: 500 }}>+91</span>
+              <input
+                id="ad-phone"
+                type="tel"
+                placeholder="XXXXXXXXXX"
+                value={doctorForm.phone}
+                onChange={(e) => setDoctorForm({ ...doctorForm, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                className={doctorFormErrors.phone ? 'input-error' : ''}
+                style={{ paddingLeft: '2.5rem', width: '100%' }}
+              />
+            </div>
+            {doctorFormErrors.phone && <span className="field-error">{doctorFormErrors.phone}</span>}
           </div>
 
           <div className="form-group">
