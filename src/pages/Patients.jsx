@@ -26,7 +26,7 @@ export default function Patients() {
 
   // Form State
   const initialForm = {
-    userName: '',
+    name: '',
     email: '',
     phone: '',
     gender: 'MALE',
@@ -60,7 +60,7 @@ export default function Patients() {
   const openEditModal = (patient) => {
     setCurrentPatient(patient);
     setForm({
-      userName: patient.userName || '',
+      name: patient.userName || '',
       email: patient.email || '',
       phone: patient.phone || '',
       gender: patient.gender || 'MALE',
@@ -82,7 +82,7 @@ export default function Patients() {
 
   const validate = () => {
     const errs = {};
-    if (!form.userName.trim()) errs.userName = 'Full name is required';
+    if (!form.name.trim()) errs.name = 'Full name is required';
     if (!form.email.trim()) errs.email = 'Email address is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email address';
     if (modalMode === 'create' && !form.password.trim()) errs.password = 'Password is required';
@@ -277,11 +277,11 @@ export default function Patients() {
                 id="p-name"
                 type="text"
                 placeholder="John Doe"
-                value={form.userName}
-                onChange={(e) => setForm({ ...form, userName: e.target.value })}
-                className={formErrors.userName ? 'input-error' : ''}
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className={formErrors.name ? 'input-error' : ''}
               />
-              {formErrors.userName && <span className="field-error">{formErrors.userName}</span>}
+              {formErrors.name && <span className="field-error">{formErrors.name}</span>}
             </div>
 
             <div className="form-group">

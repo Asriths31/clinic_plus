@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { doctorApi } from '../api/doctorApi';
+import { authApi } from '../api/authApi';
 
 export function useDoctors() {
   return useQuery({ queryKey: ['doctors'], queryFn: () => doctorApi.getAll() });
@@ -12,7 +13,7 @@ export function useDoctor(id) {
 export function useCreateDoctor() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data) => doctorApi.create(data),
+    mutationFn: (data) => authApi.register(data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['doctors'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); },
   });
 }
