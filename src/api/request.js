@@ -20,15 +20,4 @@ api.interceptors.response.use(
   }
 );
 
-async function request(endpoint, options = {}) {
-  const config = {
-    url: endpoint,
-    method: options.method || 'GET',
-    data: options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : undefined,
-    ...options
-  };
-  delete config.body;
-  return api(config);
-}
-
-export default request;
+export default api;

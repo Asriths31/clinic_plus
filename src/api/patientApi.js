@@ -1,9 +1,9 @@
-import request from './request';
+import api from './request';
 
 export const patientApi = {
-  getAll: () => request('/patients'),
-  getById: (id) => request(`/patients/${id}`),
-  create: (data) => request('/patients', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id, data) => request(`/patients/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  delete: (id) => request(`/patients/${id}`, { method: 'DELETE' }),
+  getAll: () => api.get('/patients'),
+  getById: (id) => api.get(`/patients/${id}`),
+  create: (data) => api.post('/patients', data),
+  update: (id, data) => api.put(`/patients/${id}`, data),
+  delete: (id) => api.delete(`/patients/${id}`),
 };
