@@ -25,19 +25,7 @@ import useAuthStore from '../store/authStore';
 import Modal from '../components/ui/Modal';
 import { CardSkeleton, TableSkeleton } from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
-
-export const normalizeDate = (val) => {
-  if (!val) return '';
-  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
-    return val;
-  }
-  const d = new Date(val);
-  if (isNaN(d.getTime())) return String(val).split('T')[0];
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import { getLocalDateString, formatLocalTime, formatLocalDate } from '../utils/dateUtils';
 
 const SPECIALIZATIONS = [
   'General Medicine',
@@ -86,7 +74,7 @@ export default function Dashboard() {
   const doctors = Array.isArray(doctorsRes?.data) ? doctorsRes.data : [];
   const patients = Array.isArray(patientsRes?.data) ? patientsRes.data : [];
 
-  const todayStr = normalizeDate(new Date());
+  const todayStr = getLocalDateString(new Date());
 
   // Role-scoped appointments
   const appointments = useMemo(() => {
@@ -109,13 +97,13 @@ export default function Dashboard() {
   // Doctor metrics calculations
   const doctorTodayAppointments = useMemo(() => {
     if (!isDoctor) return [];
-    return appointments.filter((a) => normalizeDate(a.appointmentDate) === todayStr);
+    return appointments.filter((a) => getLocalDateString(a.startTime) === todayStr);
   }, [appointments, isDoctor, todayStr]);
 
   const doctorUpcomingAppointments = useMemo(() => {
     if (!isDoctor) return [];
     return appointments.filter(
-      (a) => normalizeDate(a.appointmentDate) >= todayStr && a.status === 'SCHEDULED'
+      (a) => getLocalDateString(a.startTime) >= todayStr && a.status === 'SCHEDULED'
     );
   }, [appointments, isDoctor, todayStr]);
 
@@ -128,7 +116,7 @@ export default function Dashboard() {
   const upcomingPatientAppointments = useMemo(() => {
     if (!isPatient) return 0;
     return appointments.filter(
-      (a) => a.status === 'SCHEDULED' && normalizeDate(a.appointmentDate) >= todayStr
+      (a) => a.status === 'SCHEDULED' && getLocalDateString(a.startTime) >= todayStr
     ).length;
   }, [appointments, isPatient, todayStr]);
 
@@ -139,35 +127,10 @@ export default function Dashboard() {
 
   // Admin metrics
   const adminTodayAppointmentsCount = useMemo(() => {
-    return allAppointments.filter((a) => normalizeDate(a.appointmentDate) === todayStr).length;
+    return allAppointments.filter((a) => getLocalDateString(a.startTime) === todayStr).length;
   }, [allAppointments, todayStr]);
 
-  const formatTime = (timeStr) => {
-    if (!timeStr) return '';
-    try {
-      const [h, m] = timeStr.split(':');
-      const hour = parseInt(h, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${m} ${ampm}`;
-    } catch {
-      return timeStr;
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      const norm = normalizeDate(dateStr);
-      const [y, m, d] = norm.split('-').map(Number);
-      const date = new Date(y, m - 1, d);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  // Fast 1-click status update for Doctor & Admin
+  // fast 1-click status update for Doctor & Admin
   const handleQuickStatus = async (appt, newStatus) => {
     try {
       await updateApptMutation.mutateAsync({
@@ -175,9 +138,8 @@ export default function Dashboard() {
         data: {
           patientId: appt.patientId,
           doctorId: appt.doctorId,
-          appointmentDate: normalizeDate(appt.appointmentDate),
-          startTime: appt.start_time?.slice(0, 5),
-          endTime: appt.end_time?.slice(0, 5),
+          startTime: appt.startTime,
+          endTime: appt.endTime,
           reason: appt.reason,
           status: newStatus,
         },
@@ -469,13 +431,13 @@ export default function Dashboard() {
                         </div>
                       </td>
                       <td>
-                        <span className="font-medium">{formatDate(appt.appointmentDate)}</span>
+                        <span className="font-medium">{formatLocalDate(appt.startTime)}</span>
                       </td>
                       <td>
                         <div className="time-badge">
                           <FiClock size={13} />
                           <span>
-                            {formatTime(appt.start_time)} - {formatTime(appt.end_time)}
+                            {formatLocalTime(appt.startTime)} - {formatLocalTime(appt.endTime)}
                           </span>
                         </div>
                       </td>
@@ -624,12 +586,12 @@ export default function Dashboard() {
                             </div>
                           </td>
                           <td>
-                            <span className="font-medium">{formatDate(appt.appointmentDate)}</span>
+                            <span className="font-medium">{formatLocalDate(appt.startTime)}</span>
                           </td>
                           <td>
                             <div className="time-badge">
                               <FiClock size={12} />
-                              <span>{formatTime(appt.start_time)} - {formatTime(appt.end_time)}</span>
+                              <span>{formatLocalTime(appt.startTime)} - {formatLocalTime(appt.endTime)}</span>
                             </div>
                           </td>
                           <td>
@@ -901,9 +863,9 @@ export default function Dashboard() {
                       </td>
                       <td>
                         <div className="datetime-cell">
-                          <span>{formatDate(appt.appointmentDate)}</span>
+                          <span>{formatLocalDate(appt.startTime)}</span>
                           <small className="time-badge">
-                            <FiClock size={12} /> {formatTime(appt.start_time)} - {formatTime(appt.end_time)}
+                            <FiClock size={12} /> {formatLocalTime(appt.startTime)} - {formatLocalTime(appt.endTime)}
                           </small>
                         </div>
                       </td>

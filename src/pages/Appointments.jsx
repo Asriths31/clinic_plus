@@ -26,6 +26,15 @@ import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import toast from 'react-hot-toast';
+import {
+  CLINIC_TIMEZONE,
+  getLocalDateString,
+  formatLocalTime,
+  formatLocalTime24,
+  formatLocalDate,
+  formatLocalDateLong,
+  createUTCISOString
+} from '../utils/dateUtils';
 
 // 30-minute consultation slots with 15-minute grace period between sessions
 const CLINICAL_SLOTS = [
@@ -49,48 +58,39 @@ const toMinutes = (timeStr) => {
   return h * 60 + m;
 };
 
-export const normalizeDate = (val) => {
-  if (!val) return '';
-  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
-    return val;
-  }
-  const d = new Date(val);
-  if (isNaN(d.getTime())) return String(val).split('T')[0];
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 const isSunday = (dateStr) => {
   if (!dateStr) return false;
-  const norm = normalizeDate(dateStr);
-  const [year, month, day] = norm.split('-').map(Number);
-  const d = new Date(year, month - 1, day);
-  return d.getDay() === 0;
+  const iso = createUTCISOString(dateStr, '12:00');
+  const d = new Date(iso);
+  const formatter = new Intl.DateTimeFormat('en-US', { timeZone: CLINIC_TIMEZONE, weekday: 'long' });
+  return formatter.format(d) === 'Sunday';
 };
 
 const getNextAvailableDate = () => {
-  const d = new Date();
-  // If today is Sunday, start from Monday
-  if (d.getDay() === 0) {
-    d.setDate(d.getDate() + 1);
+  const dStr = getLocalDateString(new Date());
+  const iso = createUTCISOString(dStr, '12:00');
+  const d = new Date(iso);
+  const formatter = new Intl.DateTimeFormat('en-US', { timeZone: CLINIC_TIMEZONE, weekday: 'long' });
+  if (formatter.format(d) === 'Sunday') {
+    d.setTime(d.getTime() + 24 * 60 * 60 * 1000);
   }
-  return d.toISOString().split('T')[0];
+  return getLocalDateString(d);
 };
 
 const getQuickDates = () => {
   const dates = [];
-  const curr = new Date();
+  const nowStr = getLocalDateString(new Date());
+  const curr = new Date(createUTCISOString(nowStr, '12:00'));
+  
   while (dates.length < 6) {
-    if (curr.getDay() !== 0) {
-      // Exclude Sunday
-      const dateStr = curr.toISOString().split('T')[0];
-      const dayName = curr.toLocaleDateString('en-US', { weekday: 'short' });
-      const displayDate = curr.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: CLINIC_TIMEZONE, weekday: 'short' });
+    if (formatter.format(curr) !== 'Sun') {
+      const dateStr = getLocalDateString(curr);
+      const dayName = formatter.format(curr);
+      const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: CLINIC_TIMEZONE, month: 'short', day: 'numeric' }).format(curr);
       dates.push({ dateStr, dayName, displayDate });
     }
-    curr.setDate(curr.getDate() + 1);
+    curr.setTime(curr.getTime() + 24 * 60 * 60 * 1000);
   }
   return dates;
 };
@@ -186,9 +186,8 @@ export default function Appointments() {
         data: {
           patientId: appt.patientId,
           doctorId: appt.doctorId,
-          appointmentDate: normalizeDate(appt.appointmentDate),
-          startTime: appt.start_time?.slice(0, 5),
-          endTime: appt.end_time?.slice(0, 5),
+          startTime: appt.startTime,
+          endTime: appt.endTime,
           reason: appt.reason,
           status: newStatus,
         },
@@ -204,9 +203,9 @@ export default function Appointments() {
     setForm({
       patientId: appt.patientId,
       doctorId: appt.doctorId,
-      appointmentDate: normalizeDate(appt.appointmentDate),
-      startTime: appt.start_time?.slice(0, 5) || '',
-      endTime: appt.end_time?.slice(0, 5) || '',
+      appointmentDate: getLocalDateString(appt.startTime),
+      startTime: formatLocalTime24(appt.startTime),
+      endTime: formatLocalTime24(appt.endTime),
       reason: appt.reason || '',
       status: appt.status || 'SCHEDULED',
     });
@@ -258,10 +257,10 @@ export default function Appointments() {
     }
 
     // Check if slot has already passed today
-    const todayStr = normalizeDate(new Date());
+    const todayStr = getLocalDateString(new Date());
     if (form.appointmentDate === todayStr) {
-      const now = new Date();
-      const currentMins = now.getHours() * 60 + now.getMinutes();
+      const nowStr = formatLocalTime24(new Date().toISOString());
+      const currentMins = toMinutes(nowStr);
       if (toMinutes(slot.startTime) <= currentMins) {
         return { isAvailable: false, reason: 'Past Time' };
       }
@@ -272,7 +271,7 @@ export default function Appointments() {
     const doctorAppts = allAppointments.filter(
       (a) =>
         a.doctorId === parseInt(form.doctorId) &&
-        normalizeDate(a.appointmentDate) === form.appointmentDate &&
+        getLocalDateString(a.startTime) === form.appointmentDate &&
         a.status !== 'CANCELLED' &&
         a.id !== currentAppt?.id
     );
@@ -281,8 +280,8 @@ export default function Appointments() {
     const slotEndMin = toMinutes(slot.endTime);
 
     for (const appt of doctorAppts) {
-      const apptStartMin = toMinutes(appt.start_time);
-      const apptEndMin = toMinutes(appt.end_time);
+      const apptStartMin = toMinutes(formatLocalTime24(appt.startTime));
+      const apptEndMin = toMinutes(formatLocalTime24(appt.endTime));
 
       // Interval overlap with 15-min grace:
       // slot conflicts if slotStart < apptEnd + 15 AND slotEnd + 15 > apptStart
@@ -320,9 +319,8 @@ export default function Appointments() {
       const payload = {
         patientId: parseInt(isPatient ? user.id : form.patientId),
         doctorId: parseInt(form.doctorId),
-        appointmentDate: form.appointmentDate,
-        startTime: form.startTime,
-        endTime: form.endTime,
+        startTime: createUTCISOString(form.appointmentDate, form.startTime),
+        endTime: createUTCISOString(form.appointmentDate, form.endTime),
         reason: form.reason || 'General Consultation',
         ...(modalMode === 'edit' ? { status: form.status } : {}),
       };
@@ -355,30 +353,7 @@ export default function Appointments() {
     }
   };
 
-  const formatTime = (timeStr) => {
-    if (!timeStr) return '';
-    try {
-      const [h, m] = timeStr.split(':');
-      const hour = parseInt(h, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${m} ${ampm}`;
-    } catch {
-      return timeStr;
-    }
-  };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      const norm = normalizeDate(dateStr);
-      const [y, m, d] = norm.split('-').map(Number);
-      const date = new Date(y, m - 1, d);
-      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-    } catch {
-      return dateStr;
-    }
-  };
 
   const quickDates = useMemo(() => getQuickDates(), []);
 
@@ -539,12 +514,12 @@ export default function Appointments() {
                       </td>
                     )}
                     <td>
-                      <span className="font-medium">{formatDate(appt.appointmentDate)}</span>
+                      <span className="font-medium">{formatLocalDateLong(appt.startTime)}</span>
                     </td>
                     <td>
                       <div className="time-badge">
                         <FiClock size={13} />
-                        <span>{formatTime(appt.start_time)} - {formatTime(appt.end_time)}</span>
+                        <span>{formatLocalTime(appt.startTime)} - {formatLocalTime(appt.endTime)}</span>
                       </div>
                     </td>
                     <td>
@@ -721,7 +696,7 @@ export default function Appointments() {
               <label>Select Time Slot *</label>
               {form.startTime && (
                 <span className="badge badge--specialty">
-                  Selected: {formatTime(form.startTime)} - {formatTime(form.endTime)}
+                  Selected: {formatLocalTime(`1970-01-01T${form.startTime}:00Z`)} - {formatLocalTime(`1970-01-01T${form.endTime}:00Z`)}
                 </span>
               )}
             </div>
