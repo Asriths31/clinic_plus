@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// const baseURL="https://clinic-plus-server.onrender.com/api"
-const baseURL="http://localhost:2000/api"
-const api = axios.create({
+const baseURL="https://clinic-plus-server.onrender.com/api"
+// const baseURL="http://localhost:2000/api"
+
+const axiosInstance = axios.create({
   baseURL,
   withCredentials: true,
   headers: {
@@ -10,7 +11,7 @@ const api = axios.create({
   }
 });
 
-api.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const err = new Error(error.response?.data?.message || 'Something went wrong');
@@ -20,4 +21,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default axiosInstance;

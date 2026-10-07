@@ -1,9 +1,9 @@
-import api from './request';
+import axiosInstance from './request';
 
 export const appointmentApi = {
-  getAll: (date) => api.get(`/appointments${date ? `?date=${date}` : ''}`),
-  getById: (id) => api.get(`/appointments/${id}`),
-  create: (data) => api.post('/appointments', data),
-  update: (id, data) => api.put(`/appointments/${id}`, data),
-  delete: (id) => api.delete(`/appointments/${id}`),
+  getAll: (date) => axiosInstance.get(`/appointments${date ? `?date=${date}` : ''}`),
+  getById: (id) => axiosInstance.get(`/appointments/${id}`),
+  create: (data) => axiosInstance.post('/appointments', data),
+  update: (id, data) => axiosInstance.put(`/appointments/${id}`, data),
+  delete: (id) => axiosInstance.delete(`/appointments/${id}`),
 };

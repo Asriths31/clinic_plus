@@ -1,9 +1,9 @@
-import api from './request';
+import axiosInstance from './request';
 
 export const doctorApi = {
-  getAll: () => api.get('/doctors'),
-  getById: (id) => api.get(`/doctors/${id}`),
-  create: (data) => api.post('/doctors', data),
-  update: (id, data) => api.put(`/doctors/${id}`, data),
-  delete: (id) => api.delete(`/doctors/${id}`),
+  getAll: () => axiosInstance.get('/doctors'),
+  getById: (id) => axiosInstance.get(`/doctors/${id}`),
+  create: (data) => axiosInstance.post('/doctors', data),
+  update: (id, data) => axiosInstance.put(`/doctors/${id}`, data),
+  delete: (id) => axiosInstance.delete(`/doctors/${id}`),
 };

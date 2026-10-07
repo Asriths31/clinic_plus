@@ -1,8 +1,8 @@
-import api from './request';
+import axiosInstance from './request';
 
 export const authApi = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (data) => api.post('/auth/register', data),
-  logout: () => api.post('/auth/logout'),
-  getMe: () => api.get('/auth/me'),
+  login: (credentials) => axiosInstance.post('/auth/login', credentials),
+  register: (data) => axiosInstance.post('/auth/register', data),
+  logout: () => axiosInstance.post('/auth/logout'),
+  getMe: () => axiosInstance.get('/auth/me'),
 };

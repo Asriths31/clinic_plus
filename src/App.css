@@ -263,6 +263,15 @@
   letter-spacing: 0.03em;
 }
 
+@media (max-width: 480px) {
+  .topbar__greeting {
+    display: none;
+  }
+  .topbar__user {
+    gap: 0.5rem;
+  }
+}
+
 .landing {
   min-height: 100vh;
   display: flex;
@@ -334,6 +343,19 @@
 .landing__nav-links .btn--primary {
   border-radius: 9999px;
   background-color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .landing__nav-links a:not(.btn) {
+    display: none;
+  }
+  .landing__nav-links {
+    gap: 0.75rem;
+  }
+  .landing__nav-links .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
 }
 
 /* Hero Section */
@@ -411,6 +433,16 @@
   }
   .landing__hero-subtitle {
     margin: 0 auto 2rem;
+  }
+}
+@media (max-width: 480px) {
+  .landing__hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .landing__hero-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -1045,6 +1077,7 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 .page-title {
   font-size: 1.625rem;
